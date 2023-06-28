@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="gpsr_robocup" name="gpsrMain" type="Mainaudiowhisper.py"/>
+</launch>
