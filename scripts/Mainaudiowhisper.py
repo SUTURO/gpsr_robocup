@@ -7,22 +7,7 @@ from gpsr_robocup.Audioreader.SpeechLanguageInterpretator import start_gpsr
 import rospy
 from std_msgs.msg import String
 
-########################## MAIN CODE Audio ##########################################
-rospy.init_node("NLP_node")
-
-MyAudioreader.speak("Enter the total number of tasks") ## 9 june
-gpsrstage1  = int(input("Enter the total number of task: ")) ### INPUT set number of challanges
-
-start_gpsr()    # 9 june
-
-MyAudioreader.speak("Hi I am HSR")
-MyAudioreader.speak("Speech Mode is activated")
-##gpsrstage1  = 3 ### INPUT set number of challanges
-MyAudioreader.speak("Going to perfrom " +  str(gpsrstage1) + " commands")
-
-functionAudio(15)
-
-CmndNum = 0
+# probably no longer used?
 def callback(data):
     checktask = data.data
     global CmndNum
@@ -36,11 +21,41 @@ def callback(data):
             functionAudio(15)
         else:
             print('-----All Commands are Done-----')
-            MyAudioreader.speak("All" + str(gpsrstage1) + " task are done")
+           # MyAudioreader.speak("All" + str(gpsrstage1) + " task are done")
 
     else:
         print(checktask)
 
+#very ugly
+cram_state = ""
+def cram_msgs(data):
+    cram_state = data.data
 
-cram_listner = rospy.Subscriber("CRAMpub", String, callback)
-rospy.spin()
+########################## MAIN CODE Audio ##########################################
+if __name__ == "__main__":
+    try:
+        rospy.init_node("NLP_Whisper_node")
+        gpsrstage1  = 10 #TODO make better #int(input("Enter the total number of task: ")) ### INPUT set number of challanges
+        cram_sub = rospy.Subscriber('/CRAMpub', String, cram_msgs, queue_size=10)
+
+        MyAudioreader.speak("Speech Mode is activated")
+        CmndNum = 0 # no idea what this does tbh
+        while not rospy.is_shutdown():
+            rospy.loginfo("[NLP-W]: Waiting for listening signal ...")
+            cram_feedback = rospy.wait_for_message("CRAMpub", String)
+            #rospy.Subscriber('/CRAMpub', String, cram_msgs, queue_size=10)
+            if cram_feedback.data == "Listen":
+            #if cram_sub.data == "Listen":
+                MyAudioreader.speak("Please tell me what to do")
+                functionAudio(7)
+
+            #rospy.loginfo("[NLP-W]: waiting to listen.")
+
+        #rospy.spin()
+
+    except rospy.ROSInterruptException:
+        pass
+
+
+
+

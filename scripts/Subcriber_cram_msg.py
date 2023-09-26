@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 
+# DEPRECTAED + no longer used.
+
 from gpsr_robocup.DataEntering.Data_entering import CmdIntre
 import rospy
 from std_msgs.msg import String
 from gpsr_robocup.Audioreader import MyAudioreader
 from gpsr_robocup import _nlpCommands
+
 
 checkvar = ""
 

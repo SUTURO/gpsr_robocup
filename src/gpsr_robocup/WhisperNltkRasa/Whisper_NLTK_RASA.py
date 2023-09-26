@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import rospy
 import whisper
 from nltk import pos_tag, word_tokenize
 import requests
@@ -27,17 +27,21 @@ import pydub
 #    return output
 
 def whisper_decodingnew(): #### translate only into english lanaguage
+    rospy.loginfo("[NLTK-Whisper]: start transcribing ")
     ### .wav to .mp3
     sound = pydub.AudioSegment.from_wav("output.wav")  # convert to .mp3
     sound.export("mp3output.mp3", format="mp3")
-
+    rospy.loginfo("[NLTK-Whisper]: done converting to mp3 ")
     ### decode speech into text
-    model_tiny = whisper.load_model("medium")
+    model_tiny = whisper.load_model("medium.en") #should supposidly be better evtl small
     options = {"fp16": False, "language": "en", "task": "transcribe"}
-    result = model_tiny.transcribe("mp3output.mp3", **options)
-
+    result = model_tiny.transcribe("mp3output.mp3") #**options
+    #result = model_tiny.transcribe("output.wav", **options) # takes way too long
+    rospy.loginfo("[NLTK-Whisper]: done transcribing.")
+    print(result)
     return result["text"]
 
+# function which translates the sentence into the key-value pairs the planner needs
 def planinterpreter(inputtext):
     text = inputtext
 
@@ -130,7 +134,7 @@ def planinterpreter(inputtext):
         return response
 
     #print("Number of sentences : ", (len(sentences)))
-    extra_worlds = ['You can', 'Can you', 'Could you', 'Please', 'please', 'And', 'Tell me']
+    extra_worlds = ['You can', 'Can you', 'Could you', 'Please', 'please', 'And']
 
     all_plans = []
     all_parameters_type = []

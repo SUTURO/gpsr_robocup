@@ -20,10 +20,10 @@ def Plansorting(sentence_plan):
     features = 'nil'
     color = 'nil'
     number = 'nil'
-    location1 = 'nil'
-    location2 = 'nil'
-    room1 = 'nil'
-    room2 = 'nil'
+    from_location = 'nil'
+    to_location = 'nil'
+    from_room = 'nil'
+    to_room = 'nil'
     for element in parameters1:
         pr_name = parameters1[element][0]
         pr_value = parameters1[element][1]
@@ -48,40 +48,38 @@ def Plansorting(sentence_plan):
         if pr_name == 'number':
             number = pr_value
     if len(locations) == 1:
-        location1 = locations[0]
+        from_location = locations[0]
     if len(locations) == 2:
-        location1 = locations[0]
-        location2 = locations[1]
+        from_location = locations[0]
+        to_location = locations[1]
     if len(rooms) == 1:
-        room1 = rooms[0]
+        from_room = rooms[0]
     if len(rooms) == 2:
-        room1 = rooms[0]
-        room2 = rooms[1]
+        from_room = rooms[0]
+        to_room = rooms[1]
 
-    return [plan1, objectname, objecttype, personname, persontype, features, personaction, color, number, location1,
-            location2, room1, room2]
+    return [plan1, objectname, objecttype, personname, persontype, features, personaction, color, number, from_location,
+            to_location, from_room, to_room]
 
-
+# publishes detailed plan
 def planseparator(text):
     pub = rospy.Publisher('Planchatter', _nlpCommands.nlpCommands, queue_size=10, latch=True)
-    print(Plansorting(text))
-    pub.publish(Plansorting(text))
-    plan_name = (Plansorting(text))[0]
+    sorted_plan = Plansorting(text)
+    print(sorted_plan)
+    pub.publish(sorted_plan) #publishes full plan list
+    plan_name = sorted_plan[0]
     rospy.loginfo("[Planseparator]: plan name: " + plan_name)
     return (plan_name)
 
 def SpeechToCram(text):
     rospy.loginfo("[SpeechToCRAM]: input: " + text)
-    myplanss = Whisper_NLTK_RASA.planinterpreter(text)  ## text to data labeling
-    for sent_num in range(len(myplanss)):
-        if sent_num > 0:
-            text1 = (myplanss[sent_num])
-#            print("---text1---")
-#            print(text1)
-            for i in range(1):  ## how many times it published
-                data = planseparator(text1)
-#                print("---separated plan---")
-#                print(data)
+    text_plan = Whisper_NLTK_RASA.planinterpreter(text)  ## text to data labeling
+    print(text_plan)
+    for plan_count in range(len(text_plan)): #?!?
+        if plan_count > 0:
+            text = text_plan[plan_count]
+            planseparator(text)
+
 
 
 

@@ -17,11 +17,11 @@ from std_msgs.msg import String, Int32MultiArray
 #    playsound.playsound(filename)
     
 def speak(text):
-    pubwords = rospy.Publisher('hsrspeaker',String, queue_size=10)
+    pubwords = rospy.Publisher('NLP_say',String, queue_size=10, latch=True)
     rospy.loginfo('[SPEAK]: ' + text)
     for i in range(1) : pubwords.publish(text)
     #(rospy.Rate(5)).sleep()
-    time.sleep(2) #TODO find a more elegant solution to wait to be done with output
+    #time.sleep(2) #TODO find a more elegant solution to wait to be done with output
 
 ##### Record the Audio
 def audiocommand(timeinsec, texttospeak):
